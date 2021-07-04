@@ -16,16 +16,16 @@ gcloud auth application-default login
 
 ## Installation
 
-To install `firefill`, first clone the repo, install the dependencies, and then make it available globally as a `bash` command by running `npm i -g` from the repo's folder.
+To enable `firefill` as a command, first clone the repo, install the dependencies, and then make run `npm start` from the repo's folder.
 
 ```bash
   git clone [...]
   cd [...]
   npm i
-  npm i -g
+  npm start
 ```
 
-The last command will enable a new command-line command: `firefill`.
+The start command will build the project and enable the `firefill` command.
 
 ## Usage
 

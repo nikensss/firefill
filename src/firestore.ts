@@ -46,6 +46,7 @@ interface Nora {
   text: string;
   succeed(t: string): void;
 }
+
 function nora(text = 'Loading...'): Nora {
   const spinner = ora(text).start();
 
