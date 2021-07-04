@@ -1,24 +1,31 @@
+import ora from 'ora';
+
 export const firestore = async (db: FirebaseFirestore.Firestore): Promise<void> => {
   // get all collections at root level
   const collections = (await db.listCollections()).map((c) => c.id);
-  console.log('Reconstructing firestore tree structure...');
+  const spinner = nora('Reconstructing firestore tree structure...');
 
   const r: Record<string, Record<string, unknown>> = {};
   for (const collection of collections) {
-    r[collection] = await getCollections(db, collection);
+    spinner.text = `${collection}`;
+    r[collection] = await getCollections(db, collection, spinner);
   }
+  spinner.succeed('Tree reconstructed!');
+  await new Promise((res) => setTimeout(res, 750));
 
   console.log(JSON.stringify(r, null, 2));
 };
 
 async function getCollections(
   db: FirebaseFirestore.Firestore,
-  path: string
+  path: string,
+  spinner: Nora
 ): Promise<Record<string, Record<string, unknown>>> {
   const documents = await db.collection(path).listDocuments();
   const collections: Record<string, Record<string, unknown>> = {};
 
   for (const document of documents) {
+    spinner.text = `${document.id}`;
     // register document
     collections[document.id] = collections[document.id] || {};
     // get collections under this document
@@ -26,10 +33,31 @@ async function getCollections(
     for (const subcollection of subcollections) {
       collections[document.id][subcollection.id] = await getCollections(
         db,
-        `${path}/${document.id}/${subcollection.id}`
+        `${path}/${document.id}/${subcollection.id}`,
+        spinner
       );
     }
   }
 
   return collections;
+}
+
+interface Nora {
+  text: string;
+  succeed(t: string): void;
+}
+function nora(text = 'Loading...'): Nora {
+  const spinner = ora(text).start();
+
+  return {
+    get text(): string {
+      return text;
+    },
+    set text(t: string) {
+      spinner.text = `${text} ${t}`;
+    },
+    succeed(t: string) {
+      spinner.succeed(t);
+    }
+  };
 }
