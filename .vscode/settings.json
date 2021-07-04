@@ -1,14 +1,17 @@
 {
   "cSpell.words": [
-    "Tijdsvaklevering",
-    "Timeframes",
-    "firefill",
-    "gcloud",
-    "myshopify",
-    "postbuild",
-    "prebuild",
-    "prettierrc",
-    "promese",
-    "webshop"
-  ]
+		"Tijdsvaklevering",
+		"Timeframes",
+		"firefill",
+		"gcloud",
+		"myshopify",
+		"postbuild",
+		"prebuild",
+		"prestart",
+		"prettierrc",
+		"promese",
+		"subcollection",
+		"subcollections",
+		"webshop"
+	]
 }

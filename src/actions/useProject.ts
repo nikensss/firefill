@@ -16,7 +16,8 @@ export const useProject = async (project?: string): Promise<void> => {
       credential: admin.credential.applicationDefault()
     });
 
-    await firestore(admin.firestore());
+    const db = admin.firestore();
+    await firestore(db);
   } catch (ex) {
     console.log(r(`\n${ex.stack}`));
   } finally {

@@ -3,7 +3,7 @@ import { red as r } from 'chalk';
 import yargs from 'yargs';
 import { firefill } from './firefill';
 
-async function main() {
+async function main(): Promise<void> {
   const args = await yargs(process.argv.slice(2)).options({
     list: {
       type: 'boolean',
@@ -27,6 +27,4 @@ async function main() {
   await firefill(args);
 }
 
-main().catch((ex) => {
-  console.log(r(ex.stack));
-});
+main().catch((ex) => console.log(r(ex.stack)));

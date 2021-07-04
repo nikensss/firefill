@@ -11,7 +11,8 @@
     "pretty": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "lint": "eslint 'src/**/*.ts' --ext .ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node src/index.ts",
+    "prestart": "npm run build",
+    "start": "firefill",
     "prepare": "husky install",
     "postinstall": "husky install"
   },

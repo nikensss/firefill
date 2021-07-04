@@ -36,3 +36,9 @@ export async function setActiveGCP(project: string): Promise<void> {
   if (gcp !== project) throw new Error('Project could not be changed!');
   console.log(y(`Changed to ${gcp}`));
 }
+
+export async function gcloudAuthApplicationDefaultLogin(): Promise<void> {
+  console.log(y('Getting default application credentials...'));
+  await exec('gcloud auth application-default login');
+  console.log('Successfully logged in!');
+}
