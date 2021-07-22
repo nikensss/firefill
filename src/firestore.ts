@@ -1,4 +1,4 @@
-import ora from 'ora';
+import { Nora, nora } from './nora';
 
 export const firestore = async (db: FirebaseFirestore.Firestore): Promise<void> => {
   // get all collections at root level
@@ -40,25 +40,4 @@ async function getCollections(
   }
 
   return collections;
-}
-
-interface Nora {
-  text: string;
-  succeed(t: string): void;
-}
-
-function nora(text = 'Loading...'): Nora {
-  const spinner = ora(text).start();
-
-  return {
-    get text(): string {
-      return text;
-    },
-    set text(t: string) {
-      spinner.text = `${text} ${t}`;
-    },
-    succeed(t: string) {
-      spinner.succeed(t);
-    }
-  };
 }
