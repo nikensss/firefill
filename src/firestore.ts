@@ -1,43 +1,62 @@
-import { Nora, nora } from './nora';
+import { nora } from './nora';
+
+export interface FirestoreCoffee {
+  origins: CoffeeOrigin[];
+}
+
+export interface CoffeeOrigin {
+  label: string;
+  value: string;
+  weight: Weight;
+  price: Price;
+}
+
+export interface Weight {
+  amount: number;
+  unit: string;
+}
+
+export interface Price {
+  amount: number;
+  unit: string;
+}
 
 export const firestore = async (db: FirebaseFirestore.Firestore): Promise<void> => {
-  // get all collections at root level
-  const collections = (await db.listCollections()).map((c) => c.id);
-  const spinner = nora('Reconstructing firestore tree structure...');
+  const spinner = nora('Running update operation...');
 
-  const r: Record<string, Record<string, unknown>> = {};
-  for (const collection of collections) {
-    spinner.text = `${collection}`;
-    r[collection] = await getCollections(db, collection, spinner);
+  try {
+    await addPricesToCoffeeOrigins(db);
+    spinner.succeed('Update operation finished!');
+  } catch (ex) {
+    spinner.fail('Update operation failed!');
+    console.error(`Caught exception: ${ex.message}`);
   }
-  spinner.succeed('Tree reconstructed!');
-  await new Promise((res) => setTimeout(res, 750));
-
-  console.log(JSON.stringify(r, null, 2));
 };
 
-async function getCollections(
-  db: FirebaseFirestore.Firestore,
-  path: string,
-  spinner: Nora
-): Promise<Record<string, Record<string, unknown>>> {
-  const documents = await db.collection(path).listDocuments();
-  const collections: Record<string, Record<string, unknown>> = {};
+// function addPricesToCoffeeOrigins(db: FirebaseFirestore.Firestore) {
+//   const coffeeDoc = db.collection('general').doc('coffee');
+//   const { origins } = (await coffeeDoc.get()).data();
+// }
 
-  for (const document of documents) {
-    spinner.text = `${document.id}`;
-    // register document
-    collections[document.id] = collections[document.id] || {};
-    // get collections under this document
-    const subcollections = await document.listCollections();
-    for (const subcollection of subcollections) {
-      collections[document.id][subcollection.id] = await getCollections(
-        db,
-        `${path}/${document.id}/${subcollection.id}`,
-        spinner
-      );
-    }
-  }
+async function addPricesToCoffeeOrigins(db: FirebaseFirestore.Firestore) {
+  const coffeeDoc = db.collection('general').doc('coffee');
+  const coffee = (await coffeeDoc.get()).data() as FirestoreCoffee;
 
-  return collections;
+  if (!coffee) throw new Error('No coffee data!');
+
+  const { origins } = coffee;
+  const withPrices = origins.reduce((result, current) => {
+    const {
+      label,
+      weight: { amount, unit }
+    } = current;
+    result.push({
+      ...current,
+      value: `${label}-${amount}${unit}`.toLowerCase()
+    });
+
+    return result;
+  }, [] as FirestoreCoffee['origins']);
+
+  await coffeeDoc.set({ origins: withPrices }, { merge: true });
 }

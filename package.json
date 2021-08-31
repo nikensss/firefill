@@ -7,12 +7,12 @@
   "scripts": {
     "prebuild": "rimraf ./dist",
     "build": "tsc",
-    "postbuild": "npm un -g firefill && npm i -g",
-    "pretty": "prettier --config .prettierrc 'src/**/*.ts' --write",
+    "pretty": "prettier --config .prettierrc.json 'src/**/*.ts' --write",
+    "pretty:check": "prettier --config .prettierrc.json 'src/**/*.ts' --check",
     "lint": "eslint 'src/**/*.ts' --ext .ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prestart": "npm run build",
-    "start": "firefill",
+    "start": "node ./dist/index.js",
     "prepare": "husky install",
     "postinstall": "husky install"
   },
@@ -22,7 +22,7 @@
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "npm run pretty && npm run lint"
+      "pre-commit": "npm run pretty:check && npm run lint"
     }
   },
   "keywords": [],

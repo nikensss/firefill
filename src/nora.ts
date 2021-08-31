@@ -3,6 +3,7 @@ import ora from 'ora';
 export interface Nora {
   text: string;
   succeed(t: string): void;
+  fail(t: string): void;
 }
 
 export function nora(text = 'Loading...'): Nora {
@@ -17,6 +18,9 @@ export function nora(text = 'Loading...'): Nora {
     },
     succeed(t: string) {
       spinner.succeed(t);
+    },
+    fail(t: string) {
+      spinner.fail(t);
     }
   };
 }
