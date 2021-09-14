@@ -7,6 +7,7 @@ export interface FirestoreCoffee {
 export interface CoffeeOrigin {
   label: string;
   value: string;
+  id: string;
   weight: Weight;
   price: Price;
 }
@@ -33,11 +34,6 @@ export const firestore = async (db: FirebaseFirestore.Firestore): Promise<void> 
   }
 };
 
-// function addPricesToCoffeeOrigins(db: FirebaseFirestore.Firestore) {
-//   const coffeeDoc = db.collection('general').doc('coffee');
-//   const { origins } = (await coffeeDoc.get()).data();
-// }
-
 async function addPricesToCoffeeOrigins(db: FirebaseFirestore.Firestore) {
   const coffeeDoc = db.collection('general').doc('coffee');
   const coffee = (await coffeeDoc.get()).data() as FirestoreCoffee;
@@ -45,18 +41,14 @@ async function addPricesToCoffeeOrigins(db: FirebaseFirestore.Firestore) {
   if (!coffee) throw new Error('No coffee data!');
 
   const { origins } = coffee;
-  const withPrices = origins.reduce((result, current) => {
-    const {
-      label,
-      weight: { amount, unit }
-    } = current;
+  const withId = origins.reduce((result, current) => {
     result.push({
       ...current,
-      value: `${label}-${amount}${unit}`.toLowerCase()
+      id: current.id || current.value || '' // 'undefined' is not valid in firestore
     });
 
     return result;
   }, [] as FirestoreCoffee['origins']);
 
-  await coffeeDoc.set({ origins: withPrices }, { merge: true });
+  await coffeeDoc.set({ origins: withId }, { merge: true });
 }
